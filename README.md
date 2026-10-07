@@ -6,6 +6,15 @@ This repository is a public overview of a private project. Source code, data and
 
 Author: [@maren-epochs](https://github.com/maren-epochs)
 
+## Demos
+
+| Demo | Link |
+|---|---|
+| Mobile walkthrough: 14 functions, one per second, simulated data | [maren-epochs.github.io/amber-terminal](https://maren-epochs.github.io/amber-terminal/) |
+| Desktop screen recording of the real terminal: 2:00, 120 commands | [maren-epochs.github.io/amber-terminal/desktop](https://maren-epochs.github.io/amber-terminal/desktop/) |
+
+[![The Amber terminal on a desktop browser: price history, market map, Treasury analytics and live crypto panels](preview.jpg)](https://maren-epochs.github.io/amber-terminal/desktop/)
+
 ## At a glance
 
 | Measure | Value |

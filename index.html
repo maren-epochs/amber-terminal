@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amber Terminal</title>
+<meta name="description" content="Two-minute mobile walkthrough of the Amber market terminal: 14 functions, one per second, on simulated data.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Amber Terminal">
+<meta property="og:description" content="Two-minute mobile walkthrough of the Amber market terminal: 14 functions, one per second, on simulated data.">
+<meta property="og:url" content="https://maren-epochs.github.io/amber-terminal/">
+<meta property="og:image" content="https://maren-epochs.github.io/amber-terminal/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="712">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://maren-epochs.github.io/amber-terminal/preview.jpg">
+<meta name="theme-color" content="#0b0a08">
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&display=swap">
+<style>
+/* Layout: one phone-width terminal screen; header, command line, stage (scene), tape, progress. Single deliberate dark theme (amber phosphor). */
+:root{
+  --bg:#0b0a08; --panel:#13110d; --line:#2a251c; --dim:#7d725f; --fg:#e9e1cf;
+  --amber:#ffb000; --amber2:#ffcf66; --up:#3ddc84; --down:#ff5a4f; --blue:#5fb3ff; --violet:#b48cff;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace; --disp:"Chakra Petch","IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:12px;margin:0;padding-inline:16px;padding-block:12px;box-sizing:border-box;overflow-x:hidden}
+.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:8px;height:100%;min-height:600px}
+.hdr{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.logo{font-family:var(--disp);font-weight:700;letter-spacing:.18em;color:var(--amber);font-size:15px}
+.hdr .meta{margin-left:auto;display:flex;gap:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--up);box-shadow:0 0 8px var(--up);display:inline-block;margin-right:4px;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.sim{color:var(--bg);background:var(--amber);font-size:9px;padding:1px 5px;letter-spacing:.08em;font-weight:600}
+.cmd{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);padding:7px 9px;font-size:13px}
+.cmd .pr{color:var(--amber);font-weight:600}
+.cmd .txt{color:var(--amber2);white-space:nowrap;overflow:hidden;min-width:0}
+.cmd .cur{width:7px;height:14px;background:var(--amber);animation:pulse 1s steps(1) infinite}
+.cmd .go{margin-left:auto;color:var(--dim);font-size:10px}
+.tabs{display:flex;gap:4px;overflow:hidden;font-size:10px}
+.tabs span{padding:2px 6px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+.tabs span.on{color:var(--bg);background:var(--amber);border-color:var(--amber)}
+.stage{position:relative;flex:1;min-height:420px;background:var(--panel);border:1px solid var(--line);overflow:hidden}
+.scene{position:absolute;inset:0;padding:10px;display:flex;flex-direction:column;gap:8px;animation:in .18s ease-out}
+@keyframes in{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.st{display:flex;align-items:baseline;gap:8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.st b{font-family:var(--disp);color:var(--amber);font-size:14px;letter-spacing:.06em}
+.st i{font-style:normal;color:var(--dim);font-size:10px;margin-left:auto;text-align:right}
+.grid{display:grid;gap:6px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.kv{background:#0f0d0a;border:1px solid var(--line);padding:5px 6px;min-width:0}
+.kv .k{color:var(--dim);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.kv .v{font-size:14px;font-variant-numeric:tabular-nums;color:var(--fg);white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:11px}
+th{color:var(--dim);font-weight:500;text-align:right;padding:2px 3px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.05em}
+td{text-align:right;padding:2px 3px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+tr.hl td{background:#2a1f05}
+.up{color:var(--up)}.dn{color:var(--down)}.am{color:var(--amber)}.bl{color:var(--blue)}.dm{color:var(--dim)}.vi{color:var(--violet)}
+.flash-up{animation:fu .6s}.flash-dn{animation:fd .6s}
+@keyframes fu{from{background:#0f4d2c}}@keyframes fd{from{background:#5a1a16}}
+svg{display:block;width:100%;height:auto;max-width:100%}
+.tape{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;font-size:11px;padding:4px 0;font-variant-numeric:tabular-nums}
+.tape div{display:inline-block;animation:tape 40s linear infinite;padding-left:100%}
+@keyframes tape{to{transform:translateX(-100%)}}
+.foot{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--dim)}
+.bar{flex:1;height:3px;background:var(--line);position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--amber);width:0}
+.btns{display:flex;gap:6px}
+button{font:inherit;font-size:10px;background:transparent;color:var(--amber);border:1px solid var(--line);padding:3px 8px;cursor:pointer}
+button:focus-visible{outline:1px solid var(--amber)}
+.chat{display:flex;flex-direction:column;gap:7px;font-size:11.5px;line-height:1.45}
+.q{align-self:flex-end;background:#2a1f05;border:1px solid #4a3608;padding:6px 8px;max-width:85%}
+.a{border-left:2px solid var(--amber);padding:4px 8px;background:#0f0d0a}
+.fid{color:var(--blue);font-size:9.5px}
+.log{font-size:10.5px;line-height:1.5;color:var(--dim)}
+.log b{color:var(--up);font-weight:500}
+.pill{display:inline-block;padding:0 5px;border:1px solid currentColor;font-size:9px;margin-left:4px}
+.small{font-size:10px;color:var(--dim);line-height:1.4}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="hdr">
+    <span class="logo">AMBER</span><span class="sim">SIMULATED DATA</span>
+    <div class="meta"><span><span class="dot"></span>LIVE</span><span id="clk">09:41:07</span></div>
+  </div>
+  <div class="cmd"><span class="pr">&gt;</span><span class="txt" id="cmdtxt"></span><span class="cur"></span><span class="go" id="cmdgo">GO ⏎</span></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="stage" id="stage"></div>
+  <div class="tape"><div id="tape"></div></div>
+  <div class="foot"><span id="scn">01/14</span><div class="bar"><i id="prog"></i></div><span id="tleft">2:00</span>
+    <div class="btns"><button id="bp" type="button">PAUSE</button><button id="bn" type="button">NEXT ›</button></div></div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+let seed=7;const R=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const rn=(a,b)=>a+(b-a)*R();
+const f=(x,d=2)=>x.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const sg=(x,d=2)=>(x>=0?'+':'')+f(x,d);
+const cls=x=>x>=0?'up':'dn';
+const NS='http://www.w3.org/2000/svg';
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const svg=(w,h,p)=>el('svg',{viewBox:`0 0 ${w} ${h}`,preserveAspectRatio:'none'},p);
+const C={amber:'#ffb000',up:'#3ddc84',dn:'#ff5a4f',blue:'#5fb3ff',vi:'#b48cff',dim:'#7d725f',line:'#2a251c',fg:'#e9e1cf'};
+const div=(h,c)=>{const d=document.createElement('div');if(c)d.className=c;d.innerHTML=h;return d};
+const head=(code,title,note)=>`<div class="st"><b>${code}</b><span>${title}</span><i>${note||''}</i></div>`;
+
+/* tape */
+const tk=[['SPX',5871.2],['NDX',20914.6],['DJIA',43102.5],['UST10',4.182],['DXY',103.42],['EURUSD',1.0842],['GOLD',2638.1],['WTI',71.84],['BTC',96210],['ETH',3412.6],['VIX',15.42],['AAPL',231.42],['MSFT',441.18],['NVDA',138.27]];
+$('#tape').innerHTML=tk.map(([s,v])=>{const c=rn(-1.4,1.6);return `<span class="am">${s}</span> ${f(v,v<10?4:2)} <span class="${cls(c)}">${sg(c)}%</span>&nbsp;&nbsp;&nbsp;`}).join('');
+
+/* clock */
+let secs=9*3600+41*60+7;setInterval(()=>{secs++;const h=String(Math.floor(secs/3600)).padStart(2,'0'),m=String(Math.floor(secs/60)%60).padStart(2,'0'),s=String(secs%60).padStart(2,'0');$('#clk').textContent=`${h}:${m}:${s} ET`},1000);
+
+/* ---------- scenes ---------- */
+const S=[];
+
+/* 1 GP candles */
+S.push({cmd:'MSFT US Equity GP 1MIN',tab:'GP',run(st){
+  st.innerHTML=head('GP','MSFT US Equity · 1-min candles','VWAP · VOL · SMA20');
+  const W=440,H=300,s=svg(W,H,st);s.style.flex='1';
+  for(let i=1;i<6;i++)el('line',{x1:0,x2:W,y1:i*H/6,y2:i*H/6,stroke:C.line,'stroke-dasharray':'2 4'},s);
+  const N=64;let p=441,bars=[];for(let i=0;i<N;i++){const o=p,c=o+rn(-1.1,1.2),h=Math.max(o,c)+rn(0,.6),l=Math.min(o,c)-rn(0,.6);bars.push({o,c,h,l,v:rn(.2,1)});p=c}
+  const mx=Math.max(...bars.map(b=>b.h))+.5,mn=Math.min(...bars.map(b=>b.l))-.5,y=v=>10+(mx-v)/(mx-mn)*(H*.72),bw=W/N;
+  const g=el('g',{},s),vw=el('polyline',{fill:'none',stroke:C.blue,'stroke-width':1.3},s),sm=el('polyline',{fill:'none',stroke:C.vi,'stroke-width':1.1,'stroke-dasharray':'3 2'},s);
+  const lbl=el('text',{x:W-4,y:14,'text-anchor':'end',fill:C.amber,'font-size':12,'font-family':'IBM Plex Mono'},s);
+  let k=0,cum=0,cv=0,vp=[],sp=[];
+  const tick=()=>{if(k>=N)return;const b=bars[k],x=k*bw+bw/2,col=b.c>=b.o?C.up:C.dn;
+    el('line',{x1:x,x2:x,y1:y(b.h),y2:y(b.l),stroke:col},g);
+    el('rect',{x:x-bw*.33,width:bw*.66,y:y(Math.max(b.o,b.c)),height:Math.max(1,Math.abs(y(b.o)-y(b.c))),fill:col},g);
+    el('rect',{x:x-bw*.33,width:bw*.66,y:H-b.v*55,height:b.v*55,fill:col,opacity:.35},g);
+    cum+=b.c*b.v;cv+=b.v;vp.push(`${x},${y(cum/cv)}`);vw.setAttribute('points',vp.join(' '));
+    const sl=bars.slice(Math.max(0,k-19),k+1);sp.push(`${x},${y(sl.reduce((a,c)=>a+c.c,0)/sl.length)}`);sm.setAttribute('points',sp.join(' '));
+    lbl.textContent=`${f(b.c)}  ${sg((b.c-441)/441*100)}%`;k++};
+  const g2=div(`<div class="grid g3"><div class="kv"><div class="k">Last</div><div class="v am" id="gl">—</div></div><div class="kv"><div class="k">VWAP</div><div class="v bl">${f(441.6)}</div></div><div class="kv"><div class="k">Volume</div><div class="v">18.42M</div></div></div>`);st.appendChild(g2);
+  return ()=>{tick();tick();const b=bars[Math.min(k,N)-1];if(b)$('#gl').textContent=f(b.c)}
+}});
+
+/* 2 DES */
+S.push({cmd:'DES',tab:'DES',run(st){
+  st.innerHTML=head('DES','Company description','SEC XBRL · FY ends Jun')+`
+  <div class="grid g2">${[['Mkt cap','3.28T'],['EV/EBITDA','24.1x'],['P/E (NTM)','33.6x'],['Div yield','0.75%'],['Beta (2Y)','0.94'],['52-wk range','385.6–468.4'],['Shares out','7.43B'],['Float','99.9%']].map(([k,v])=>`<div class="kv"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('')}</div>
+  <div class="small">Segments: Productivity &amp; Business Processes · Intelligent Cloud · More Personal Computing. Every value is a Fact record with source, period, unit and as-of time.</div>`;
+  const s=svg(440,120,st);const seg=[['Intelligent Cloud',.43,C.amber],['Productivity',.33,C.blue],['Personal Computing',.24,C.vi]];
+  let x=0;seg.forEach(([n,w,c],i)=>{el('rect',{x,y:10,width:440*w-2,height:34,fill:c,opacity:.85},s);const t=el('text',{x:x+6,y:62,fill:c,'font-size':11,'font-family':'IBM Plex Mono'},s);t.textContent=`${n} ${Math.round(w*100)}%`;x+=440*w});
+  const sp=[];for(let i=0;i<40;i++)sp.push(`${i*11},${110-(i*1.2+rn(-6,6))}`);el('polyline',{points:sp.join(' '),fill:'none',stroke:C.up,'stroke-width':1.5},s);
+  return null}});
+
+/* 3 FA */
+S.push({cmd:'FA IS Q',tab:'FA',run(st){
+  const yrs=['Q3 25','Q4 25','Q1 26','Q2 26','Q3 26'];
+  const rows=[['Revenue',[65.6,69.6,70.1,76.4,77.9]],['Gross profit',[45.5,47.8,48.1,52.4,53.6]],['Op. income',[30.6,31.7,32.0,34.3,35.1]],['Net income',[24.7,24.1,25.8,27.2,28.4]],['Diluted EPS',[3.30,3.23,3.46,3.65,3.81]],['FCF',[19.3,21.0,22.4,25.6,24.9]],['R&amp;D',[7.5,7.9,8.1,8.4,8.6]]];
+  st.innerHTML=head('FA','Income statement · US$ bn','As reported · XBRL')+`<table><tr><th></th>${yrs.map(y=>`<th>${y}</th>`).join('')}<th>YoY</th></tr>${rows.map(([n,v],i)=>`<tr${i==4?' class="hl"':''}><td>${n}</td>${v.map(x=>`<td>${f(x)}</td>`).join('')}<td class="${cls(v[4]-v[0])}">${sg((v[4]/v[0]-1)*100,1)}%</td></tr>`).join('')}</table>
+  <div class="grid g3"><div class="kv"><div class="k">Gross margin</div><div class="v">68.8%</div></div><div class="kv"><div class="k">Op. margin</div><div class="v">45.1%</div></div><div class="kv"><div class="k">ROIC</div><div class="v up">31.4%</div></div></div>
+  <div class="small">Golden-set check: 8 of 2,007 values differ from the reference (0.40%, gate 2%).</div>`;
+  const s=svg(440,110,st);[65.6,69.6,70.1,76.4,77.9].forEach((v,i)=>{const h=(v-55)*3.4,r=el('rect',{x:20+i*84,y:100,width:50,height:0,fill:C.amber},s);r.animate([{height:0,y:100},{height:h,y:100-h}],{duration:700,delay:i*120,fill:'forwards'})});
+  return null}});
+
+/* 4 MOST */
+S.push({cmd:'MOST',tab:'MOST',run(st){
+  const names=['NVDA','TSLA','AMD','PLTR','SMCI','AAPL','META','AMZN','COIN','MSTR','AVGO','NFLX'];
+  const d=names.map(n=>({n,p:rn(30,900),c:rn(-6,9),v:rn(10,240)}));
+  st.innerHTML=head('MOST','Most active · US','Real-time · 3,018 names')+`<table id="mt"><tr><th>Sym</th><th>Last</th><th>Chg%</th><th>Vol</th><th>Value $M</th><th>RelVol</th></tr></table>`;
+  const t=st.querySelector('#mt');const rs=d.map(x=>{const r=t.insertRow();r.innerHTML=`<td class="am">${x.n}</td><td></td><td></td><td></td><td></td><td></td>`;return r});
+  const draw=()=>{d.forEach((x,i)=>{const dc=rn(-.25,.27);x.p*=1+dc/100;x.c+=dc;x.v+=rn(0,1.5);const c=rs[i].cells;c[1].textContent=f(x.p);c[2].textContent=sg(x.c)+'%';c[2].className=cls(x.c);c[3].textContent=f(x.v,1)+'M';c[4].textContent=f(x.v*x.p/10,0);c[5].textContent=f(1+Math.abs(x.c)/3,2)+'x';if(R()<.3){c[1].className='';void c[1].offsetWidth;c[1].className=dc>=0?'flash-up':'flash-dn'}})};
+  draw();st.appendChild(div(`<div class="small">Liquid universe quoted in 8 parallel batches of 400; cached 60 s, shared by MOST and MMAP.</div>`));
+  let n=0;return ()=>{if(++n%8==0)draw()}}});
+
+/* 5 MMAP */
+S.push({cmd:'MMAP SPX',tab:'MMAP',run(st){
+  st.innerHTML=head('MMAP','S&amp;P 500 market map','Area = weight · color = day %');
+  const W=440,H=330,s=svg(W,H,st);
+  const sec=[['Tech',.31],['Fin',.13],['Health',.11],['Disc',.10],['Comm',.09],['Ind',.08],['Staples',.06],['Energy',.04],['Util',.03],['RE',.025],['Mat',.025]];
+  const col=v=>v>=0?`rgba(61,220,132,${.25+Math.min(v,3)/4})`:`rgba(255,90,79,${.25+Math.min(-v,3)/4})`;
+  const cells=[];let x=0,y=0,rowH=0,rem=W;
+  /* simple slice-and-dice */
+  let yy=0;const rows=[[0,1],[2,3,4],[5,6,7,8,9,10]];rows.forEach(rw=>{const tot=rw.reduce((a,i)=>a+sec[i][1],0),h=H*tot/1;let xx=0;rw.forEach(i=>{const w=W*sec[i][1]/tot;const sub=Math.max(2,Math.round(sec[i][1]*30));for(let j=0;j<sub;j++){const sw=w/sub>18?w/sub:w,sh=w/sub>18?h:h/sub;const cx=w/sub>18?xx+j*sw:xx,cy=w/sub>18?yy:yy+j*sh;const v=rn(-2.5,3);const r=el('rect',{x:cx+.5,y:cy+.5,width:sw-1,height:sh-1,fill:col(v)},s);cells.push([r,v])}const t=el('text',{x:xx+5,y:yy+14,fill:'#fff','font-size':11,'font-weight':600,'font-family':'IBM Plex Mono'},s);t.textContent=sec[i][0];xx+=w});yy+=h});
+  st.appendChild(div(`<div class="grid g3"><div class="kv"><div class="k">Advancers</div><div class="v up">318</div></div><div class="kv"><div class="k">Decliners</div><div class="v dn">179</div></div><div class="kv"><div class="k">Implied move</div><div class="v up">+0.62%</div></div></div>`));
+  return ()=>{for(let k=0;k<6;k++){const c=cells[Math.floor(R()*cells.length)];c[1]+=rn(-.4,.4);c[0].setAttribute('fill',col(c[1]))}}}});
+
+/* 6 GC */
+S.push({cmd:'GC',tab:'GC',run(st){
+  st.innerHTML=head('GC','US Treasury par curve','Today · 1M ago · 1Y ago');
+  const T=['1M','3M','6M','1Y','2Y','3Y','5Y','7Y','10Y','20Y','30Y'],now=[4.62,4.55,4.41,4.21,4.02,3.98,4.01,4.09,4.18,4.47,4.39],m1=now.map((v,i)=>v+rn(-.12,.08)),y1=[5.52,5.48,5.38,5.05,4.62,4.41,4.25,4.24,4.22,4.48,4.36];
+  const W=440,H=230,s=svg(W,H,st),x=i=>30+i*(W-40)/10,y=v=>15+(5.7-v)/(5.7-3.7)*(H-40);
+  [4,4.5,5,5.5].forEach(v=>{el('line',{x1:30,x2:W,y1:y(v),y2:y(v),stroke:C.line},s);const t=el('text',{x:2,y:y(v)+4,fill:C.dim,'font-size':10,'font-family':'IBM Plex Mono'},s);t.textContent=v.toFixed(1)});
+  T.forEach((t,i)=>{const e=el('text',{x:x(i),y:H-4,fill:C.dim,'font-size':9,'text-anchor':'middle','font-family':'IBM Plex Mono'},s);e.textContent=t});
+  const pl=(a,c,dash,w)=>{const p=el('polyline',{points:a.map((v,i)=>`${x(i)},${y(v)}`).join(' '),fill:'none',stroke:c,'stroke-width':w,'stroke-dasharray':dash||''},s);const L=900;p.style.strokeDasharray=dash||L;if(!dash){p.style.strokeDashoffset=L;p.animate([{strokeDashoffset:L},{strokeDashoffset:0}],{duration:1600,fill:'forwards'})}};
+  pl(y1,C.dim,'4 3',1.2);pl(m1,C.blue,'2 2',1.2);pl(now,C.amber,'',2.2);now.forEach((v,i)=>el('circle',{cx:x(i),cy:y(v),r:2.6,fill:C.amber},s));
+  st.appendChild(div(`<div class="grid g3"><div class="kv"><div class="k">2s10s</div><div class="v up">+16.0bp</div></div><div class="kv"><div class="k">5s30s</div><div class="v up">+38.0bp</div></div><div class="kv"><div class="k">3M10Y</div><div class="v dn">−37.0bp</div></div></div><div class="small">Swap curve reprices its own SOFR futures within 0.0000 bp (13 SR3 contracts).</div>`));
+  return null}});
+
+/* 7 YAS */
+S.push({cmd:'91282CRP8 Govt YAS',tab:'YAS',run(st){
+  st.innerHTML=head('YAS','UST 4.750% 30-Sep-2028','Yield &amp; spread analysis')+`
+  <div class="grid g2">${[['Price','100-07+'],['Yield (s.a.)','4.6214%'],['Mod. duration','1.873'],['Convexity','0.0451'],['DV01 / 1MM','$187.41'],['Accrued','$1,298.08'],['Spread vs SOFR','−18.4bp'],['Z-spread','−12.9bp'],['Settle','T+1 · 02-Oct'],['Next coupon','31-Mar-2027']].map(([k,v])=>`<div class="kv"><div class="k">${k}</div><div class="v" data-k="${k}">${v}</div></div>`).join('')}</div>`;
+  const s=svg(440,120,st);const pts=[];for(let i=0;i<=60;i++){const yv=3.6+i*.04,pr=100+(4.6214-yv)*1.873*1+.0451*Math.pow(4.6214-yv,2)*.5;pts.push(`${i*7.3},${110-(pr-98)*25}`)}el('polyline',{points:pts.join(' '),fill:'none',stroke:C.amber,'stroke-width':1.8},s);
+  const tx=el('text',{x:4,y:12,fill:C.dim,'font-size':10,'font-family':'IBM Plex Mono'},s);tx.textContent='price / yield (convex)';
+  const pe=st.querySelector('[data-k="Price"]'),ye=st.querySelector('[data-k="Yield (s.a.)"]');let n=0;
+  return ()=>{if(++n%10)return;const d=rn(-.006,.006);ye.textContent=f(4.6214+d,4)+'%';pe.textContent='100-'+String(7+Math.round(-d*60)).padStart(2,'0')+(R()<.5?'+':'');ye.className='v '+(d<0?'up':'dn')}}});
+
+/* 8 OMON */
+S.push({cmd:'NVDA US Equity OMON',tab:'OMON',run(st){
+  st.innerHTML=head('OMON','NVDA options · 21-Nov','IV · Δ · Γ · ν · ORATS');
+  const K=[120,125,130,135,140,145,150,155],S0=138.27;
+  st.innerHTML+=`<table><tr><th>Bid</th><th>Ask</th><th>IV</th><th>Δ</th><th style="text-align:center">Strike</th><th>Δ</th><th>IV</th><th>Bid</th><th>Ask</th></tr>${K.map(k=>{const m=(k-S0)/S0,iv=.42+m*m*2.8-m*.25,dc=Math.max(.04,Math.min(.97,.5-m*3.1)),c=Math.max(.15,S0-k)+iv*7*Math.exp(-m*m*18),p=Math.max(.15,k-S0)+iv*7*Math.exp(-m*m*18);return `<tr${Math.abs(k-S0)<3?' class="hl"':''}><td>${f(c-.08)}</td><td>${f(c+.08)}</td><td class="bl">${f(iv*100,1)}</td><td>${f(dc)}</td><td style="text-align:center" class="am">${k}</td><td>${f(dc-1)}</td><td class="bl">${f((iv+.01)*100,1)}</td><td>${f(p-.08)}</td><td>${f(p+.08)}</td></tr>`}).join('')}</table>`;
+  const s=svg(440,120,st);const pts=[];for(let i=0;i<=40;i++){const m=-.2+i*.01;pts.push(`${i*11},${100-(.42+m*m*2.8-m*.25-.38)*700}`)}el('polyline',{points:pts.join(' '),fill:'none',stroke:C.vi,'stroke-width':2},s);
+  const t=el('text',{x:4,y:12,fill:C.dim,'font-size':10,'font-family':'IBM Plex Mono'},s);t.textContent='volatility smile · skew −0.25';
+  st.appendChild(div(`<div class="small">Values checked against the broker's bid-ask after the close: 179 of 187 inside (95.7%).</div>`));
+  return null}});
+
+/* 9 WEI */
+S.push({cmd:'WEI',tab:'WEI',run(st){
+  const ix=[['S&amp;P 500',5871.2],['Nasdaq 100',20914.6],['Dow Jones',43102.5],['Russell 2000',2381.4],['Euro Stoxx 50',4912.8],['DAX',19342.1],['FTSE 100',8221.4],['Nikkei 225',39181.0],['Hang Seng',20412.6],['ASX 200',8302.7],['KOSPI',2588.4],['Sensex',81205.3]].map(([n,v])=>({n,v,c:rn(-1.5,1.6),h:Array.from({length:24},()=>rn(-1,1))}));
+  st.innerHTML=head('WEI','World equity indices','Live · delayed · close');
+  const t=document.createElement('table');t.innerHTML='<tr><th>Index</th><th>Last</th><th>Chg%</th><th>Trend</th></tr>';st.appendChild(t);
+  const rs=ix.map(x=>{const r=t.insertRow();r.innerHTML=`<td>${x.n}</td><td></td><td></td><td style="width:90px"></td>`;return r});
+  const draw=()=>ix.forEach((x,i)=>{const d=rn(-.05,.055);x.c+=d;x.v*=1+d/100;x.h.push(x.c);x.h.shift();const c=rs[i].cells;c[1].textContent=f(x.v);c[2].textContent=sg(x.c)+'%';c[2].className=cls(x.c);
+    const mn=Math.min(...x.h),mx=Math.max(...x.h)+.01;c[3].innerHTML=`<svg viewBox="0 0 90 16" preserveAspectRatio="none"><polyline fill="none" stroke="${x.c>=0?C.up:C.dn}" stroke-width="1.3" points="${x.h.map((v,j)=>`${j*90/23},${15-(v-mn)/(mx-mn)*14}`).join(' ')}"/></svg>`});
+  draw();let n=0;return ()=>{if(++n%6==0)draw()}}});
+
+/* 10 CRYP book */
+S.push({cmd:'BTC-USD Curncy BOOK',tab:'BOOK',run(st){
+  st.innerHTML=head('BOOK','BTC-USD · depth','Coinbase public feed · L2');
+  const W=440,H=200,s=svg(W,H,st);const mid=96210;
+  const bidP=el('path',{fill:'rgba(61,220,132,.25)',stroke:C.up,'stroke-width':1.5},s),askP=el('path',{fill:'rgba(255,90,79,.25)',stroke:C.dn,'stroke-width':1.5},s);
+  el('line',{x1:W/2,x2:W/2,y1:0,y2:H,stroke:C.amber,'stroke-dasharray':'3 3'},s);
+  const bk=div('','');st.appendChild(bk);
+  const draw=()=>{let cb=0,ca=0,b=[`M${W/2},${H}`],a=[`M${W/2},${H}`];for(let i=0;i<=40;i++){cb+=rn(.1,1.4)*(1+i/12);ca+=rn(.1,1.4)*(1+i/12);b.push(`L${W/2-i*5.4},${H-cb*2.4}`);a.push(`L${W/2+i*5.4},${H-ca*2.4}`)}b.push(`L${W/2-216},${H}Z`);a.push(`L${W/2+216},${H}Z`);bidP.setAttribute('d',b.join(''));askP.setAttribute('d',a.join(''));
+    const m=mid+rn(-30,30);bk.innerHTML=`<table><tr><th>Bid size</th><th>Bid</th><th>Ask</th><th>Ask size</th></tr>${Array.from({length:7},(_,i)=>`<tr><td class="up">${f(rn(.01,3.2),4)}</td><td class="up">${f(m-.5-i*rn(.5,4))}</td><td class="dn">${f(m+.5+i*rn(.5,4))}</td><td class="dn">${f(rn(.01,3.2),4)}</td></tr>`).join('')}</table><div class="small">Spread 1.00 · mid ${f(m)} · 24h vol 18,402 BTC</div>`};
+  draw();let n=0;return ()=>{if(++n%5==0)draw()}}});
+
+/* 11 ECO */
+S.push({cmd:'ECO',tab:'ECO',run(st){
+  const ev=[['08:30','US','Nonfarm payrolls','Sep',' 142K','160K','254K'],['08:30','US','Unemployment rate','Sep','4.2%','4.1%','4.1%'],['08:30','US','Avg hourly earnings m/m','Sep','0.4%','0.3%','0.4%'],['10:00','US','ISM services','Sep','51.5','51.7','54.9'],['10:00','US','JOLTS openings','Aug','7.67M','7.66M','8.04M'],['14:00','US','FOMC minutes','Sep','—','—','—'],['04:00','EZ','HCOB composite PMI','Sep','48.9','49.6','49.6'],['02:00','DE','Industrial production','Aug','−2.4%','0.8%','2.9%']];
+  st.innerHTML=head('ECO','Economic calendar','Point-in-time first releases')+`<table><tr><th>ET</th><th style="text-align:left">Event</th><th>Prior</th><th>Cons.</th><th>Actual</th></tr>${ev.map(e=>`<tr><td class="dm">${e[0]}</td><td style="text-align:left"><span class="am">${e[1]}</span> ${e[2]}</td><td>${e[4]}</td><td>${e[5]}</td><td class="${e[6]>e[5]?'up':'dn'}">${e[6]}</td></tr>`).join('')}</table>`;
+  const s=svg(440,120,st);let v=0;const p=[];for(let i=0;i<48;i++){v=rn(80,320);const h=v/3.2;el('rect',{x:i*9.1,y:110-h,width:7,height:h,fill:i==47?C.amber:'#3a3123'},s)}
+  const t=el('text',{x:4,y:12,fill:C.dim,'font-size':10,'font-family':'IBM Plex Mono'},s);t.textContent='payrolls, last 48 months (K) · first-release vintage';
+  return null}});
+
+/* 12 AI analyst */
+S.push({cmd:'AI why did MSFT margins expand?',tab:'AI',run(st){
+  st.innerHTML=head('AI','Analyst · facts-bound','Every number cites a fact id');
+  const box=div('','chat');st.appendChild(box);box.appendChild(div('Why did MSFT operating margin expand over the last four quarters?','q'));
+  const ans=div('','a');box.appendChild(ans);
+  const parts=[`Revenue grew <span class="am">18.7%</span> <span class="fid">[f:9c1e…a07]</span> while R&amp;D grew <span class="am">14.7%</span> <span class="fid">[f:3b72…e10]</span>, so operating leverage did most of the work. `,`Intelligent Cloud rose to <span class="am">43%</span> of revenue <span class="fid">[f:77d0…c4f]</span>, a higher-margin mix. `,`<br><br><span class="dm">Not in the data: segment-level operating expense. The analyst abstains rather than estimate.</span>`];
+  let i=0;
+  box.appendChild(div(`<div class="grid g3"><div class="kv"><div class="k">Correct</div><div class="v up">125/125</div></div><div class="kv"><div class="k">Abstains</div><div class="v up">25/25</div></div><div class="kv"><div class="k">Unbound #</div><div class="v up">0</div></div></div>`));
+  let n=0;return ()=>{if(++n%14==0&&i<parts.length){ans.innerHTML+=parts[i++]}}}});
+
+/* 13 BT */
+S.push({cmd:'BT NDX MOM6_1 TOP 20',tab:'BT',run(st){
+  st.innerHTML=head('BT','Backtest · 6-1 momentum, top 20','Point-in-time members · TR · 10bp cost');
+  const W=440,H=210,s=svg(W,H,st);let a=100,b=100;const pa=[],pb=[],dd=[];let pk=100;
+  for(let i=0;i<120;i++){a*=1+rn(-.045,.058);b*=1+rn(-.035,.045);pk=Math.max(pk,a);pa.push([i,a]);pb.push([i,b]);dd.push([i,a/pk-1])}
+  const mx=Math.max(...pa.map(p=>p[1]),...pb.map(p=>p[1])),x=i=>i*W/119,y=v=>10+(mx-v)/(mx-60)*(H*.7);
+  [100,200,300].forEach(v=>{if(v<mx)el('line',{x1:0,x2:W,y1:y(v),y2:y(v),stroke:C.line,'stroke-dasharray':'2 4'},s)});
+  const la=el('polyline',{fill:'none',stroke:C.amber,'stroke-width':2},s),lb=el('polyline',{fill:'none',stroke:C.dim,'stroke-width':1.2},s),ar=el('path',{fill:'rgba(255,90,79,.3)'},s);
+  st.appendChild(div(`<div class="grid g3"><div class="kv"><div class="k">CAGR</div><div class="v up">21.4%</div></div><div class="kv"><div class="k">Sharpe</div><div class="v">1.12</div></div><div class="kv"><div class="k">Max DD</div><div class="v dn">−27.8%</div></div><div class="kv"><div class="k">vs NDX</div><div class="v up">+4.9%/yr</div></div><div class="kv"><div class="k">Turnover</div><div class="v">38%/mo</div></div><div class="kv"><div class="k">Hit rate</div><div class="v">57.5%</div></div></div>`));
+  let k=0;return ()=>{if(k>=120)return;k=Math.min(120,k+2);la.setAttribute('points',pa.slice(0,k).map(p=>`${x(p[0])},${y(p[1])}`).join(' '));lb.setAttribute('points',pb.slice(0,k).map(p=>`${x(p[0])},${y(p[1])}`).join(' '));ar.setAttribute('d',`M0,${H}`+dd.slice(0,k).map(p=>`L${x(p[0])},${H+p[1]*150}`).join('')+`L${x(k-1)},${H}Z`)}}});
+
+/* 14 HLTH */
+S.push({cmd:'HLTH',tab:'HLTH',run(st){
+  const pv=[['SEC EDGAR','ok',212],['FRED','ok',148],['Treasury','ok',301],['FINRA','ok',264],['Broker quotes','ok',41],['Coinbase WS','ok',18],['CME settle','ok',388],['Options IV','ok',97],['News feeds','ok',176],['ECB FX','ok',122]];
+  st.innerHTML=head('HLTH','System health','Circuit breaker: 3 fails → 10 min pause')+`<table><tr><th>Provider</th><th>State</th><th>p50 ms</th><th>Calls/h</th></tr>${pv.map(p=>`<tr><td>${p[0]}</td><td class="up">● ${p[1]}</td><td>${p[2]}</td><td>${Math.round(rn(20,900))}</td></tr>`).join('')}</table>
+  <div class="grid g2"><div class="kv"><div class="k">First render p95</div><div class="v up">1,151 ms</div></div><div class="kv"><div class="k">Cached p95</div><div class="v up">49 ms</div></div><div class="kv"><div class="k">Autocomplete p95</div><div class="v up">22 ms</div></div><div class="kv"><div class="k">Exit tests</div><div class="v up">16 / 16</div></div></div>`;
+  const lg=div('','log');st.appendChild(lg);const L=['pytest 415 passed','e2e 32/32 ok (headless Edge)','gap check: 0 missing days','restore drill: all files opened','route fuzz: 0 HTTP 500','warm pass 22 entries ok'];let i=0,n=0;
+  return ()=>{if(++n%12==0&&i<L.length){lg.innerHTML+=`<div><b>✓</b> ${L[i++]}</div>`}}}});
+
+/* ---------- player ---------- */
+const DUR=1000,TOTAL=120000,stage=$('#stage');let idx=-1,t0=0,start=0,pausedMs=0,step=null,paused=false,pauseAt=0,typing=null,elapsed0=0;
+$('#tabs').innerHTML=S.map(s=>`<span>${s.tab}</span>`).join('');
+const typeCmd=s=>{clearInterval(typing);const tx=$('#cmdtxt');tx.textContent='';let i=0;$('#cmdgo').style.color='';typing=setInterval(()=>{tx.textContent=s.slice(0,++i);if(i>=s.length){clearInterval(typing);$('#cmdgo').style.color='var(--amber)'}},6)};
+const show=i=>{idx=(i+S.length)%S.length;seed=7+idx*131;const sc=S[idx];typeCmd(sc.cmd);
+  [...$('#tabs').children].forEach((e,j)=>e.className=j==idx?'on':'');
+  const tb=$('#tabs').children[idx];tb.scrollIntoView&&$('#tabs').scrollTo({left:tb.offsetLeft-120,behavior:'smooth'});
+  stage.innerHTML='';const d=document.createElement('div');d.className='scene';stage.appendChild(d);step=sc.run(d);t0=performance.now();
+  $('#scn').textContent=String(idx+1).padStart(2,'0')+'/'+S.length};
+let last=0;
+const loop=now=>{requestAnimationFrame(loop);if(paused)return;
+  if(now-t0>DUR){show(idx+1)}
+  if(now-last>16){last=now;for(let r=0;r<4;r++)step&&step()}
+  const tot=(now-start-pausedMs)%TOTAL,left=TOTAL-tot;
+  $('#prog').style.width=(tot/TOTAL*100)+'%';$('#tleft').textContent=Math.floor(left/60000)+':'+String(Math.floor(left/1000)%60).padStart(2,'0')};
+$('#bp').onclick=()=>{paused=!paused;$('#bp').textContent=paused?'PLAY':'PAUSE';if(paused)pauseAt=performance.now();else{const d=performance.now()-pauseAt;t0+=d;pausedMs+=d}};
+$('#bn').onclick=()=>show(idx+1);
+[...$('#tabs').children].forEach((e,j)=>e.onclick=()=>show(j));
+start=performance.now();show(0);requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>

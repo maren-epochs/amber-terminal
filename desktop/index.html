@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amber Terminal Desktop</title>
+<meta name="description" content="Two-minute screen recording of the real Amber terminal in a desktop browser, one command per second.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Amber Terminal Desktop">
+<meta property="og:description" content="Two-minute screen recording of the real Amber terminal in a desktop browser, one command per second.">
+<meta property="og:url" content="https://maren-epochs.github.io/amber-terminal/desktop/">
+<meta property="og:image" content="https://maren-epochs.github.io/amber-terminal/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="712">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://maren-epochs.github.io/amber-terminal/preview.jpg">
+<meta name="theme-color" content="#0b0a08">
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Chakra+Petch:wght@700&display=swap">
+<style>
+/* Layout: one centered column; header line, the video at full width, one caption line. Single dark theme to match the terminal. */
+:root{--bg:#0b0a08;--fg:#e9e1cf;--dim:#7d725f;--amber:#ffb000;--line:#2a251c;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;--disp:"Chakra Petch",ui-monospace,monospace;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:13px;margin:0;padding-inline:16px;padding-block:16px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.hdr{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.logo{font-family:var(--disp);font-weight:700;letter-spacing:.18em;color:var(--amber);font-size:18px}
+.hdr span{color:var(--dim)}
+video{width:100%;max-width:100%;height:auto;aspect-ratio:1280/760;background:#000;border:1px solid var(--line)}
+.cap{color:var(--dim);line-height:1.5;max-width:75ch}
+.cap b{color:var(--amber);font-weight:600}
+</style>
+<div class="wrap">
+  <div class="hdr"><span class="logo">AMBER</span><span>Desktop terminal · 2:00 · recorded 7 Oct 2026</span></div>
+  <video src="amber-desktop.webm" poster="../preview.jpg" controls autoplay muted loop playsinline preload="auto"></video>
+  <p class="cap">The <b>real Amber terminal</b>, recorded in a desktop browser. A new command runs every second, rotating across four panels: charts, financials, movers, market map, yield curve, Treasury analytics, options, crypto, futures, economics, news and screens, 120 commands in all. Data is end-of-day or delayed from free sources, as each panel's header states.</p>
+</div>
+
+</body>
+</html>

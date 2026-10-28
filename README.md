@@ -11,7 +11,7 @@ Author: [@maren-epochs](https://github.com/maren-epochs)
 | Demo | Link |
 |---|---|
 | Mobile walkthrough: 14 functions, one per second, simulated data | [maren-epochs.github.io/amber-terminal](https://maren-epochs.github.io/amber-terminal/) |
-| Desktop screen recording of the real terminal: 2:00, 120 commands | [maren-epochs.github.io/amber-terminal/desktop](https://maren-epochs.github.io/amber-terminal/desktop/) |
+| Desktop screen recording of the real terminal: 1:42, 97 commands (recorded 26 Oct 2026) | [maren-epochs.github.io/amber-terminal/desktop](https://maren-epochs.github.io/amber-terminal/desktop/) |
 
 [![The Amber terminal on a desktop browser: price history, market map, Treasury analytics and live crypto panels](preview.jpg)](https://maren-epochs.github.io/amber-terminal/desktop/)
 
